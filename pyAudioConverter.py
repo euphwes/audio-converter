@@ -88,7 +88,7 @@ def gather_files_from_subdirs(directory):
     """Generator which yields a list of audio files from every subdirectory in
     the supplied directory, one subdirectory at a time."""
 
-    music_exts = ['.flac', '.FLAC', '.wav', '.WAV', '.ogg', '.OGG', '.mp3', '.MP3']
+    music_exts = ['.flac', '.FLAC', '.wav', '.WAV', '.ogg', '.OGG', '.mp3', '.MP3', '.m4a', '.M4A']
 
     for root, _, files in os.walk(directory):
         music_files = list(filter(lambda x: os.path.splitext(x)[1] in music_exts, files))
