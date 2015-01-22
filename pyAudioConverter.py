@@ -75,7 +75,11 @@ def perform_conversion(args):
             new_file_with_ext = '{}.{}'.format(orig_file_no_ext, args.format)
             new_file_path = os.path.join(target_dir, new_file_with_ext)
 
-            ffmpeg_args = ['-i', music_file, '-qscale:a', args.quality, new_file_path]
+            ffmpeg_args = ['-i', music_file, '-qscale:a', args.quality, '-vn']
+            if args.format == 'ogg':
+                ffmpeg_args.extend(['-codec:a','libvorbis'])
+            ffmpeg_args.append(new_file_path)
+
             print('    Converting: {}'.format(orig_file_no_ext))
             run_command(ffmpeg_path, ffmpeg_args, shell=True)
 
