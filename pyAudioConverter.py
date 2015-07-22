@@ -15,7 +15,7 @@ def run_command(command, args, shell=False):
 
 
 def perform_conversion(args):
-    """Use ffmpeg to perform music file conversion. The arguments contain a
+    """ Use ffmpeg to perform music file conversion. The arguments contain a
     top-level directory, presumably an artist directory, or containing several
     artist directories. The directories are examined recursively, and the ones 
     containing music files are considered to be album directories, and those 
@@ -45,7 +45,8 @@ def perform_conversion(args):
                 /Insomniac (ogg)
             /Tipper
                 /Puzzle Dust EP (ogg)
-                /Shatter Box EP (ogg)"""
+                /Shatter Box EP (ogg)
+    """
 
     ffmpeg_path = run_command('where', ['ffmpeg'], shell=True)
     if 'Could not find files' in ffmpeg_path:
@@ -75,7 +76,11 @@ def perform_conversion(args):
             new_file_with_ext = '{}.{}'.format(orig_file_no_ext, args.format)
             new_file_path = os.path.join(target_dir, new_file_with_ext)
 
-            ffmpeg_args = ['-i', music_file, '-qscale:a', args.quality, '-vn']
+            ffmpeg_args = ['-i', music_file]
+            if args.quality == '320k':
+                ffmpeg_args.extend(['-b:a', args.quality, '-vn'])
+            else:
+                ffmpeg_args.extend(['-qscale:a', args.quality, '-vn'])
             if args.format == 'ogg':
                 ffmpeg_args.extend(['-codec:a','libvorbis'])
             ffmpeg_args.append(new_file_path)
