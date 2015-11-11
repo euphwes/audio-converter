@@ -1,9 +1,11 @@
 import os, argparse
 from subprocess import Popen, PIPE
 
+#-------------------------------------------------------------------------------------------------
+
 def run_command(command, args, shell=False):
-    """Runs the specified command-line tool, gathers the output, splits on
-    newlines, and returns the list of lines to the caller."""
+    """ Runs the specified command-line tool, gathers the output, splits on newlines, and returns
+    the list of lines to the caller. """
 
     command = [command]
     command.extend(args)
@@ -15,17 +17,16 @@ def run_command(command, args, shell=False):
 
 
 def perform_conversion(args):
-    """ Use ffmpeg to perform music file conversion. The arguments contain a
-    top-level directory, presumably an artist directory, or containing several
-    artist directories. The directories are examined recursively, and the ones 
-    containing music files are considered to be album directories, and those 
-    albums are processed. Those album folders are recreated at the same level as
-    the original album folder, and the target format is appended to the folder 
-    name in parentheses. Each music file in the original album is converted to 
-    the target format, and placed in the newly-created directory.
+    """ Use ffmpeg to perform music file conversion. The arguments contain a top-level directory,
+    presumably an artist directory, or containing several artist directories. The directories are
+    examined recursively, and the ones containing music files are considered to be album
+    directories, and those albums are processed. Those album folders are recreated at the same
+    level as the original album folder, and the target format is appended to the folder name in
+    parentheses. Each music file in the original album is converted to the target format, and
+    placed in the newly-created directory.
 
-    For example, consider a directory structure like this, with music files in the
-    deepest directories only:
+    For example, consider a directory structure like this, with music files in the deepest
+    directories only:
 
         /music
             /Green Day
@@ -35,9 +36,8 @@ def perform_conversion(args):
                 /Puzzle Dust EP
                 /Shatter Box EP
 
-    After processing with a target format of 'ogg', the music files will be converted,
-    and placed in the following directory structure (without altering the original
-    files or directory structure):
+    After processing with a target format of 'ogg', the music files will be converted, and placed
+    in the following structure (without altering the original files or directory structure):
 
         /music
             /Green Day
@@ -90,8 +90,8 @@ def perform_conversion(args):
 
 
 def gather_files_from_subdirs(directory):
-    """Generator which yields a list of audio files from every subdirectory in
-    the supplied directory, one subdirectory at a time."""
+    """ Generator which yields a list of audio files from every subdirectory in the supplied
+    directory, one subdirectory at a time. """
 
     music_exts = ['.flac', '.FLAC', '.wav', '.WAV', '.ogg', '.OGG', '.mp3', '.MP3', '.m4a', '.M4A']
 
@@ -101,15 +101,17 @@ def gather_files_from_subdirs(directory):
         if len(music_files) > 0:
             yield music_files
 
-#-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------
 
-parser = argparse.ArgumentParser()
-parser.add_argument('directory', help='The directory whose FLAC files to convert.')
-parser.add_argument('-f', '--format', required=True, help='The output format (mp3 or ogg) to convert to.', choices=['ogg','mp3','flac','wav'])
-parser.add_argument('-q', '--quality', required=True, help='The desired output quality of the converted file.')
-args = parser.parse_args()
+if __name__ == '__main__':
 
-# make sure format is lowercase so we don't have to deal with that later
-args.format = args.format.lower()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('directory', help='The directory whose audio files to convert.')
+    parser.add_argument('-f', '--format', required=True, help='The output format (mp3 or ogg) to convert to.', choices=['ogg','mp3','flac','wav'])
+    parser.add_argument('-q', '--quality', required=True, help='The desired output quality of the converted file.')
+    args = parser.parse_args()
 
-perform_conversion(args)
+    # make sure format is lowercase so we don't have to deal with that later
+    args.format = args.format.lower()
+
+    perform_conversion(args)
