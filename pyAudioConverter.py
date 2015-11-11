@@ -3,17 +3,14 @@ from subprocess import Popen, PIPE
 
 #-------------------------------------------------------------------------------------------------
 
-def run_command(command, args, shell=False):
+def run_command(command, args):
     """ Runs the specified command-line tool, gathers the output, splits on newlines, and returns
     the list of lines to the caller. """
 
-    command = [command]
-    command.extend(args)
+    full_command = [command] + args
 
-    proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=shell)
-
-    output_lines = proc.communicate()[0].decode('UTF-8').split('\r\n')
-    return output_lines
+    proc = Popen(full_command, stdout=PIPE, stderr=PIPE, shell=True)
+    return proc.communicate()[0].decode('UTF-8').split('\r\n')
 
 
 def perform_conversion(args):
@@ -48,7 +45,7 @@ def perform_conversion(args):
                 /Shatter Box EP (ogg)
     """
 
-    ffmpeg_path = run_command('where', ['ffmpeg'], shell=True)
+    ffmpeg_path = run_command('where', ['ffmpeg'])
     if 'Could not find files' in ffmpeg_path:
         print("ffmpeg not found.")
         sys.exit(1)
@@ -86,7 +83,7 @@ def perform_conversion(args):
             ffmpeg_args.append(new_file_path)
 
             print('    Converting: {}'.format(orig_file_no_ext))
-            run_command(ffmpeg_path, ffmpeg_args, shell=True)
+            run_command(ffmpeg_path, ffmpeg_args)
 
 
 def gather_files_from_subdirs(directory):
