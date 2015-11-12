@@ -102,7 +102,7 @@ def gather_files_from_subdirs(directory):
     for root, _, files in os.walk(directory):
         music_files = list(filter(lambda x: os.path.splitext(x)[1] in music_exts, files))
         music_files = list(os.path.join(root, f) for f in music_files)
-        if len(music_files) > 0:
+        if music_files:
             yield music_files
 
 #-------------------------------------------------------------------------------------------------
