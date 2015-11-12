@@ -6,11 +6,8 @@ from subprocess import Popen, PIPE
 def run_command(command, args):
     """ Runs the specified command-line tool, gathers the output, splits on newlines, and returns
     the list of lines to the caller. """
-
-    full_command = [command] + args
-
-    proc = Popen(full_command, stdout=PIPE, stderr=PIPE, shell=True)
-    return proc.communicate()[0].decode('UTF-8').split('\r\n')
+    proc = Popen([command] + args, stdout=PIPE, stderr=PIPE)
+    return proc.communicate()[0].decode().split('\r\n')
 
 
 def perform_conversion(args):
