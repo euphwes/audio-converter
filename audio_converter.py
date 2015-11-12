@@ -1,5 +1,7 @@
-import os, argparse
+from argparse import ArgumentParser
 from sys import stdout
+from os import walk, makedirs
+from os.path import splitext, join, split, exists
 from subprocess import Popen, PIPE
 
 #-------------------------------------------------------------------------------------------------
@@ -64,21 +66,21 @@ def perform_conversion(args):
 
     for music_in_directory in gather_files_from_subdirs(args.directory):
 
-        current_dir = os.path.split(music_in_directory[0])[0]
-        old_album_name = os.path.split(current_dir)[1]
+        current_dir = split(music_in_directory[0])[0]
+        old_album_name = split(current_dir)[1]
         new_album_name = '{} ({})'.format(old_album_name, args.format)
-        artist_dir = os.path.split(current_dir)[0]
-        target_dir = os.path.join(artist_dir, new_album_name)
+        artist_dir = split(current_dir)[0]
+        target_dir = join(artist_dir, new_album_name)
 
-        if not os.path.exists(target_dir):
-            os.makedirs(target_dir)
+        if not exists(target_dir):
+            makedirs(target_dir)
 
         pprint('\nProcessing "{}" into "{}"'.format(old_album_name, new_album_name))
 
         for music_file in music_in_directory:
-            orig_file_no_ext = os.path.splitext(os.path.split(music_file)[1])[0]
+            orig_file_no_ext = splitext(split(music_file)[1])[0]
             new_file_with_ext = '{}.{}'.format(orig_file_no_ext, args.format)
-            new_file_path = os.path.join(target_dir, new_file_with_ext)
+            new_file_path = join(target_dir, new_file_with_ext)
 
             ffmpeg_args = ['-i', music_file]
             if args.quality == '320k':
@@ -97,11 +99,11 @@ def gather_files_from_subdirs(directory):
     """ Generator which yields a list of audio files from every subdirectory in the supplied
     directory, one subdirectory at a time. """
 
-    music_exts = ['.flac', '.FLAC', '.wav', '.WAV', '.ogg', '.OGG', '.mp3', '.MP3', '.m4a', '.M4A']
+    music_extensions = ['.flac', '.wav', '.ogg', '.mp3', '.m4a']
+    is_file_extension_valid = lambda x: splitext(x)[1].lower() in music_extensions
 
-    for root, _, files in os.walk(directory):
-        music_files = list(filter(lambda x: os.path.splitext(x)[1] in music_exts, files))
-        music_files = list(os.path.join(root, f) for f in music_files)
+    for root, _, files in walk(directory):
+        music_files = list(map(lambda x: join(root, x), filter(is_file_extension_valid, files)))
         if music_files:
             yield music_files
 
@@ -109,7 +111,7 @@ def gather_files_from_subdirs(directory):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
     parser.add_argument('directory', help='The directory whose audio files to convert.')
     parser.add_argument('-f', '--format', required=True, help='The output format (mp3 or ogg) to convert to.', choices=['ogg','mp3','flac','wav'])
     parser.add_argument('-q', '--quality', required=True, help='The desired output quality of the converted file.')
