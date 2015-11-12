@@ -75,9 +75,7 @@ def perform_conversion(args):
             makedirs(target_dir)
 
         for music_file in music_file_list:
-            orig_file_no_ext = splitext(split(music_file)[1])[0]
-            new_file_with_ext = '{}.{}'.format(orig_file_no_ext, args.format)
-            new_file_path = join(target_dir, new_file_with_ext)
+            new_file_path = determine_new_file_path(music_file, target_dir, args.format)
 
             ffmpeg_args = ['-i', music_file]
             if args.quality == '320k':
@@ -88,8 +86,18 @@ def perform_conversion(args):
                 ffmpeg_args.extend(['-codec:a','libvorbis'])
             ffmpeg_args.append(new_file_path)
 
-            pprint('    Converting: {}'.format(orig_file_no_ext))
             run_command(ffmpeg_path, ffmpeg_args)
+
+
+def determine_new_file_path(music_file, target_dir, output_format):
+    """ Determine and return the new file name (with format) and path. """
+
+    orig_file_no_ext = splitext(split(music_file)[1])[0]
+    pprint('    Converting: {}'.format(orig_file_no_ext))
+
+    new_file_with_ext = '{}.{}'.format(orig_file_no_ext, output_format)
+
+    return join(target_dir, new_file_with_ext)
 
 
 def determine_album_dir(directory, output_format):
