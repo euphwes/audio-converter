@@ -76,17 +76,25 @@ def perform_conversion(args):
 
         for music_file in music_file_list:
             new_file_path = determine_new_file_path(music_file, target_dir, args.format)
-
-            ffmpeg_args = ['-i', music_file]
-            if args.quality == '320k':
-                ffmpeg_args.extend(['-b:a', args.quality, '-vn'])
-            else:
-                ffmpeg_args.extend(['-qscale:a', args.quality, '-vn'])
-            if args.format == 'ogg':
-                ffmpeg_args.extend(['-codec:a','libvorbis'])
-            ffmpeg_args.append(new_file_path)
-
+            ffmpeg_args = build_ffmpeg_args(music_file, new_file_path, args.quality, args.format)
             run_command(ffmpeg_path, ffmpeg_args)
+
+
+def build_ffmpeg_args(old_file, new_file, quality, out_format):
+    """ Build the args to ffmpeg using the old and new file, output quality and format """
+
+    ffmpeg_args = ['-i', old_file]
+    if quality == '320k':
+        ffmpeg_args.extend(['-b:a', quality, '-vn'])
+    else:
+        ffmpeg_args.extend(['-qscale:a', quality, '-vn'])
+
+    if out_format == 'ogg':
+        ffmpeg_args.extend(['-codec:a','libvorbis'])
+
+    ffmpeg_args.append(new_file)
+
+    return ffmpeg_args
 
 
 def determine_new_file_path(music_file, target_dir, output_format):
