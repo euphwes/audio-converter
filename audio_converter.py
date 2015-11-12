@@ -66,16 +66,13 @@ def perform_conversion(args):
 
     for music_file_list in gather_music_from_subdirs(args.directory):
 
+        # pull the current directory from the first music file name, and use that to determine
+        # target album directory
         current_dir = split(music_file_list[0])[0]
-        old_album_name = split(current_dir)[1]
-        new_album_name = '{} ({})'.format(old_album_name, args.format)
-        artist_dir = split(current_dir)[0]
-        target_dir = join(artist_dir, new_album_name)
+        new_album_name, target_dir = determine_album_dir(current_dir, args.format)
 
         if not exists(target_dir):
             makedirs(target_dir)
-
-        pprint('\nProcessing "{}" into "{}"'.format(old_album_name, new_album_name))
 
         for music_file in music_file_list:
             orig_file_no_ext = splitext(split(music_file)[1])[0]
@@ -93,6 +90,19 @@ def perform_conversion(args):
 
             pprint('    Converting: {}'.format(orig_file_no_ext))
             run_command(ffmpeg_path, ffmpeg_args)
+
+
+def determine_album_dir(directory, output_format):
+    """ Determine the target directory name, and the new album name (with format included) based
+    on the directory provided. """
+
+    artist_dir, old_album_name = split(directory)
+    new_album_name = '{} ({})'.format(old_album_name, output_format)
+    target_dir = join(artist_dir, new_album_name)
+
+    pprint('\nProcessing "{}" into "{}"'.format(old_album_name, new_album_name))
+
+    return new_album_name, target_dir
 
 
 def gather_music_from_subdirs(directory):
