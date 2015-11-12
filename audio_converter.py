@@ -1,5 +1,15 @@
 import os, argparse
+from sys import stdout
 from subprocess import Popen, PIPE
+
+#-------------------------------------------------------------------------------------------------
+
+def pprint(value):
+    """ Custom print which prints the supplied value, and immediately flushes stdout. Useful if
+    stdout is being buffered because we're piping it from a subprocess, but we still want to see
+    printed info in the console immediately. """
+    print(value)
+    stdout.flush()
 
 #-------------------------------------------------------------------------------------------------
 
@@ -44,13 +54,13 @@ def perform_conversion(args):
 
     ffmpeg_path = run_command('where', ['ffmpeg'])
     if 'Could not find files' in ffmpeg_path:
-        print("ffmpeg not found.")
+        pprint("ffmpeg not found.")
         sys.exit(1)
 
-    print('\nPerforming conversion:')
-    print('    Output format: ' + args.format)
+    pprint('\nPerforming conversion:')
+    pprint('    Output format: ' + args.format)
     if args.quality and not args.format in ['flac','wav']:
-        print('    Output quality: ' + args.quality)
+        pprint('    Output quality: ' + args.quality)
 
     for music_in_directory in gather_files_from_subdirs(args.directory):
 
@@ -63,7 +73,7 @@ def perform_conversion(args):
         if not os.path.exists(target_dir):
             os.makedirs(target_dir)
 
-        print('\nProcessing "{}" into "{}"'.format(old_album_name, new_album_name))
+        pprint('\nProcessing "{}" into "{}"'.format(old_album_name, new_album_name))
 
         for music_file in music_in_directory:
             orig_file_no_ext = os.path.splitext(os.path.split(music_file)[1])[0]
@@ -79,7 +89,7 @@ def perform_conversion(args):
                 ffmpeg_args.extend(['-codec:a','libvorbis'])
             ffmpeg_args.append(new_file_path)
 
-            print('    Converting: {}'.format(orig_file_no_ext))
+            pprint('    Converting: {}'.format(orig_file_no_ext))
             run_command(ffmpeg_path, ffmpeg_args)
 
 
