@@ -64,9 +64,9 @@ def perform_conversion(args):
     if args.quality and not args.format in ['flac','wav']:
         pprint('    Output quality: ' + args.quality)
 
-    for music_in_directory in gather_files_from_subdirs(args.directory):
+    for music_file_list in gather_music_from_subdirs(args.directory):
 
-        current_dir = split(music_in_directory[0])[0]
+        current_dir = split(music_file_list[0])[0]
         old_album_name = split(current_dir)[1]
         new_album_name = '{} ({})'.format(old_album_name, args.format)
         artist_dir = split(current_dir)[0]
@@ -77,7 +77,7 @@ def perform_conversion(args):
 
         pprint('\nProcessing "{}" into "{}"'.format(old_album_name, new_album_name))
 
-        for music_file in music_in_directory:
+        for music_file in music_file_list:
             orig_file_no_ext = splitext(split(music_file)[1])[0]
             new_file_with_ext = '{}.{}'.format(orig_file_no_ext, args.format)
             new_file_path = join(target_dir, new_file_with_ext)
@@ -95,7 +95,7 @@ def perform_conversion(args):
             run_command(ffmpeg_path, ffmpeg_args)
 
 
-def gather_files_from_subdirs(directory):
+def gather_music_from_subdirs(directory):
     """ Generator which yields a list of audio files from every subdirectory in the supplied
     directory, one subdirectory at a time. """
 
